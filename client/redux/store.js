@@ -6,7 +6,7 @@ import thunkMiddleware from 'redux-thunk';
 // ACTION TYPES go here:
 const GOT_STUDENTS = 'GOT_STUDENTS';
 const GOT_SINGLE_STUDENT = 'GOT_SINGLE_STUDENT'
-
+const DELETE_STUDENT = 'DELETE_STUDENT'
 
 // ACTION CREATORS go here:
 const gotStudents = (students) => ({
@@ -19,6 +19,10 @@ const gotSingleStudent = (student) => ({
   student
 });
 
+const deleteStudent = (id) => ({
+  type: DELETE_STUDENT,
+  id
+})
 
 // THUNK CREATORS go here:
 export const fetchStudents = () => async (dispatch) => {
@@ -31,6 +35,11 @@ export const fetchSingleStudent = (id) => async (dispatch) => {
   dispatch(gotSingleStudent(data));
 }
 
+export const deleteStudentById = (id) => async
+dispatch => {
+  await axios.delete(`/api/students/${id}`)
+  dispatch(deleteStudent(id))
+}
 
 const initialState = {
   students: [],
@@ -48,6 +57,12 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         singleStudent: action.student
+      }
+    case DELETE_STUDENT:
+      const remainingStudents = state.students.filter((student) => student.id !== action.id)
+      return {
+        ...state, 
+        students: remainingStudents
       }
     default:
       return state;
